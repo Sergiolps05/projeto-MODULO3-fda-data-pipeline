@@ -1,61 +1,83 @@
-# 💊 FDA Data Analytics Pipeline & AI Dashboard
+# 💊 Projeto: FDA Data Analytics Pipeline & AI Dashboard
+**Desenvolvido por:** Sérgio
 
-[![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
-[![Pandas](https://img.shields.io/badge/Pandas-Data_Manipulation-150458.svg)](https://pandas.pydata.org/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-FF4B4B.svg)](https://streamlit.io/)
-
-## 📌 Visão Geral do Projeto
-Este projeto de portfólio demonstra a construção de um pipeline de dados ponta a ponta (ETL), focado em substituir processos manuais e fechamentos operacionais morosos por automação inteligente. 
-
-O sistema consome dados abertos da base de medicamentos da **FDA (Food and Drug Administration)**, realiza a higienização utilizando processamento vetorizado, e consolida as informações em um Dashboard interativo integrado a um Agente de Inteligência Artificial (LLM) para extração de *insights* executivos.
+## 📌 O Tema e a Pergunta de Negócio
+* **Tema:** Automação de extração e tratamento de dados regulatórios do setor farmacêutico para painéis de *Business Intelligence*.
+* **A Pergunta:** Como podemos automatizar a extração, higienização e análise descritiva de dados da FDA para identificar a concentração de mercado e os fabricantes dominantes, sem a necessidade de intervenção manual em planilhas?
 
 ---
 
-## 🎯 Etapa do Projeto: Pitch Executivo (Data Analytics & Big Data)
-
-Este repositório consolida a entrega técnica para a apresentação do *Pitch* executivo. A arquitetura foi desenhada para comprovar a transição de um problema operacional para uma solução orientada a dados (*Data-Driven*):
-
-* **O Problema:** Ineficiência e falta de padronização na categorização de grandes volumes de dados regulatórios da indústria farmacêutica, dificultando a tomada de decisão rápida.
-* **A Solução:** Implementação de um pipeline escalável em Python que extrai, traduz (Data Localization) e modela os dados, disponibilizando-os em uma interface visual de alto contraste e conectada a um LLM.
-* **O Impacto:** Redução do tempo de análise de horas para segundos, garantindo governança (Data Quality) e acessibilidade da informação para a diretoria.
+## 📡 API Utilizada
+A extração de dados (Camada Bronze) foi construída consumindo diretamente a API pública da FDA. Evitou-se o uso de ferramentas de RPA como PyAutoGUI ou Selenium, pois integrações via API RESTful garantem resiliência e velocidade máxima na coleta de dados estruturados.
+* **Nome da API:** openFDA (National Drug Code Directory)
+* **Documentação Oficial:** [https://open.fda.gov/apis/drug/ndc/](https://open.fda.gov/apis/drug/ndc/)
+* **Como acessar:** A API possui *endpoints* públicos abertos. O projeto consome a rota GET `https://api.fda.gov/drug/ndc.json?limit=400` para extrair uma amostra validada, sem a necessidade de chaves de autenticação (API Keys).
 
 ---
 
-## 🏗️ Arquitetura de Dados e Decisões Técnicas
-
-O projeto foi estruturado em três camadas independentes, garantindo resiliência e aderência às melhores práticas de Engenharia de Software (código limpo e PEP 8):
-
-### 1. Camada Bronze (Ingestão de Dados)
-* **Script:** `1_extracao.py`
-* **Tecnologia:** Python (`requests`, `json`)
-* **Decisão Arquitetônica (API vs. RPA):** A extração foi construída consumindo diretamente a API RESTful da FDA. Evitou-se ferramentas de automação de interface (*RPA*) de desktop como **PyAutoGUI** (frágil e monopoliza a máquina) ou *scrapers* web como **Selenium** e **Playwright** (focados em performance de navegação, mas desnecessários quando há *endpoints* públicos). A API garante resiliência e velocidade máxima na coleta do JSON bruto.
-
-### 2. Camada Prata/Ouro (Transformação e Qualidade)
-* **Script:** `2_tratamento_traduzido.py`
-* **Tecnologia:** `Pandas`, `NumPy`
-* **Processamento (Vetorização):** 
-  * **Achatamento:** Uso do `pd.json_normalize()` para converter matrizes aninhadas em tabelas relacionais em milissegundos.
-  * **Data Quality:** Remoção rigorosa de duplicatas e valores nulos (`dropna`, `drop_duplicates`) para manter a integridade referencial.
-  * **Data Localization:** Aplicação do método vetorizado `.map()` e `.str.upper()` para traduzir variáveis e padronizar textos sem o uso de laços `for` lentos, entregando a base em português do Brasil.
-* **Saída:** Geração de um arquivo `Base_Tratada_FDA.csv` limpo, formatado como uma verdadeira Tabela Fato.
-
-### 3. Camada de Visualização (Business Intelligence)
-* **Script:** `dash.py`
-* **Tecnologia:** `Streamlit`, `Plotly Express`
-* **Interface (UX/UI):** Dashboard responsivo utilizando `st.container(border=True)` para criar *Cards* de KPIs e gráficos iterativos, priorizando a escaneabilidade visual. O uso do `@st.cache_data` impede o recarregamento redundante da base.
-* **Integração BI:** O formato tabular exportado atua como fonte universal. A mesma base que alimenta o Streamlit está perfeitamente modelada para ser importada no **Power BI** ou **Looker Studio**, pronta para a criação de um modelo em *Esquema Estrela (Star Schema)* sem necessidade de transformações pesadas em linguagem M ou DAX.
+## 🗄️ A Base de Dados Gerada
+O script de tratamento utiliza a vetorização nativa das bibliotecas **Pandas** e **NumPy** para achatar o JSON, remover inconsistências (nulos e duplicatas) e traduzir as informações de forma escalável. 
+O resultado é a geração da tabela fato **`Base_Tratada_FDA.csv`**, estruturada nos padrões para criação de *Star Schema* (Esquema Estrela) no Power BI ou Looker. As principais colunas geradas são:
+* `NOME_COMERCIAL`: Nome de mercado do medicamento (traduzido do original *brand_name*).
+* `NOME_GENERICO`: Princípio ativo do medicamento (*generic_name*).
+* `FABRICANTE`: Empresa responsável pela produção (*labeler_name*).
+* `TIPO_PRODUTO`: Categoria regulatória do produto traduzida para o português, como "Medicamento sob Prescrição" ou "Medicamento Isento de Prescrição" (*product_type*).
 
 ---
 
-## 🤖 Integração com Inteligência Artificial
-Para transcender a análise descritiva, o painel web possui um redirecionamento *Low-Code* nativo para o **NotebookLM**. O usuário é guiado a interagir com o Agente de IA para analisar anomalias nas proporções de fabricantes e gerar resumos textuais em linguagem natural.
+## 🤖 Integração Low-Code (Agente de IA)
+Para fornecer uma interface de análise prescritiva, a Tabela Fato foi integrada ao **NotebookLM** do Google (ferramenta Low-Code baseada em LLM). O Agente permite que gestores conversem com os dados estruturados em linguagem natural. 
+
+**3 exemplos de perguntas que o agente responde ao vivo:**
+1. *"Quais são as três categorias de produtos farmacêuticos mais frequentes nesta base e qual o volume de cada uma?"*
+2. *"Liste os top 5 fabricantes com maior diversidade de medicamentos comerciais registrados."*
+3. *"Faça um resumo executivo identificando se existe uma concentração de mercado (monopólio) em algum tipo específico de produto regulamentado."*
 
 ---
 
-## 🚀 Como Executar o Projeto Localmente
+## 🚀 Instruções de Execução (Como rodar o projeto localmente)
 
-1. **Clone o repositório e instale as dependências:**
-   ```bash
-   git clone [https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git](https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git)
-   cd SEU_REPOSITORIO
-   pip install pandas plotly streamlit requests
+Para garantir as boas práticas de desenvolvimento e evitar conflitos de versão no seu sistema, siga o passo a passo abaixo para executar o pipeline e o painel iterativo:
+
+### 1. Criação do Ambiente Virtual (PEP 8 / Boas Práticas)
+Abra o terminal na raiz do projeto e crie um ambiente virtual isolado. Em seguida, ative-o:
+
+```bash
+# Criação do ambiente virtual
+python -m venv .venv
+
+# Ativação no Windows (Terminal VS Code)
+.venv\Scripts\activate
+
+# Ativação no Linux/Mac
+source .venv/bin/activate
+```
+
+### 2. Instalação das Bibliotecas Necessárias
+Com o ambiente ativado (você verá `(.venv)` no terminal), instale as bibliotecas. Utilizamos **Pandas** e **NumPy** para processamento vetorizado em alta velocidade e **Streamlit** com **Plotly** para a renderização do Dashboard:
+
+```bash
+pip install pandas numpy plotly streamlit requests
+```
+
+### 3. Variáveis de Ambiente e Segurança
+O projeto realiza requisições HTTP (`requests`) para os *endpoints* públicos da API da FDA. Como são dados governamentais abertos, **não há necessidade** de configurar um arquivo `.env` com tokens de acesso ou senhas. A conexão é direta e anônima.
+
+### 4. Execução do Pipeline (ETL) e Interface
+Execute os comandos abaixo sequencialmente na raiz do projeto:
+
+**Passo A: Ingestão e Tratamento (Camada de Dados)**
+```bash
+# 1. Puxa os dados brutos (JSON) da API
+python 1_extracao.py
+
+# 2. Aplica limpeza vetorizada e exporta a Base_Tratada_FDA.csv
+python 2_tratamento_traduzido.py
+```
+
+**Passo B: Visualização (Business Intelligence)**
+```bash
+# 3. Levanta o servidor local da interface web
+streamlit run dash.py
+```
+*(O painel abrirá automaticamente no seu navegador padrão. A aplicação utiliza o decorador `@st.cache_data` do Streamlit para armazenar a leitura da base em cache, garantindo que as filtragens e os gráficos sejam atualizados instantaneamente sem reprocessar o CSV).*

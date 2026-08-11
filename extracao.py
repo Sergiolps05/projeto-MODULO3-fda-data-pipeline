@@ -9,7 +9,7 @@ def extrair_dados_api():
     """
     Atua como a camada de Ingestão do pipeline de dados.
     """
-    print("📡 Iniciando conexão com a API da FDA...")
+    print(" Iniciando conexão com a API da FDA...")
     
     # Web/APIs: O requests.get faz a comunicação direta via protocolo HTTP
     resposta = requests.get(URL_API_FDA)
