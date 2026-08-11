@@ -1,13 +1,13 @@
-# 💊 Projeto: FDA Data Analytics Pipeline & AI Dashboard
-**Desenvolvido por:** Sérgio
+#  Projeto: FDA Data Analytics Pipeline & AI Dashboard
+**Desenvolvido por:** Sergio
 
-## 📌 O Tema e a Pergunta de Negócio
+## O Tema e a Pergunta de Negócio
 * **Tema:** Automação de extração e tratamento de dados regulatórios do setor farmacêutico para painéis de *Business Intelligence*.
 * **A Pergunta:** Como podemos automatizar a extração, higienização e análise descritiva de dados da FDA para identificar a concentração de mercado e os fabricantes dominantes, sem a necessidade de intervenção manual em planilhas?
 
 ---
 
-## 📡 API Utilizada
+##  API Utilizada
 A extração de dados (Camada Bronze) foi construída consumindo diretamente a API pública da FDA. Evitou-se o uso de ferramentas de RPA como PyAutoGUI ou Selenium, pois integrações via API RESTful garantem resiliência e velocidade máxima na coleta de dados estruturados.
 * **Nome da API:** openFDA (National Drug Code Directory)
 * **Documentação Oficial:** [https://open.fda.gov/apis/drug/ndc/](https://open.fda.gov/apis/drug/ndc/)
@@ -15,7 +15,7 @@ A extração de dados (Camada Bronze) foi construída consumindo diretamente a A
 
 ---
 
-## 🗄️ A Base de Dados Gerada
+##  A Base de Dados Gerada
 O script de tratamento utiliza a vetorização nativa das bibliotecas **Pandas** e **NumPy** para achatar o JSON, remover inconsistências (nulos e duplicatas) e traduzir as informações de forma escalável. 
 O resultado é a geração da tabela fato **`Base_Tratada_FDA.csv`**, estruturada nos padrões para criação de *Star Schema* (Esquema Estrela) no Power BI ou Looker. As principais colunas geradas são:
 * `NOME_COMERCIAL`: Nome de mercado do medicamento (traduzido do original *brand_name*).
@@ -25,7 +25,7 @@ O resultado é a geração da tabela fato **`Base_Tratada_FDA.csv`**, estruturad
 
 ---
 
-## 🤖 Integração Low-Code (Agente de IA)
+##  Integração Low-Code (Agente de IA)
 Para fornecer uma interface de análise prescritiva, a Tabela Fato foi integrada ao **NotebookLM** do Google (ferramenta Low-Code baseada em LLM). O Agente permite que gestores conversem com os dados estruturados em linguagem natural. 
 
 **3 exemplos de perguntas que o agente responde ao vivo:**
@@ -35,7 +35,7 @@ Para fornecer uma interface de análise prescritiva, a Tabela Fato foi integrada
 
 ---
 
-## 🚀 Instruções de Execução (Como rodar o projeto localmente)
+##  Instruções de Execução (Como rodar o projeto localmente)
 
 Para garantir as boas práticas de desenvolvimento e evitar conflitos de versão no seu sistema, siga o passo a passo abaixo para executar o pipeline e o painel iterativo:
 
@@ -69,10 +69,10 @@ Execute os comandos abaixo sequencialmente na raiz do projeto:
 **Passo A: Ingestão e Tratamento (Camada de Dados)**
 ```bash
 # 1. Puxa os dados brutos (JSON) da API
-python 1_extracao.py
+python extracao.py
 
 # 2. Aplica limpeza vetorizada e exporta a Base_Tratada_FDA.csv
-python 2_tratamento_traduzido.py
+python tratamento.py
 ```
 
 **Passo B: Visualização (Business Intelligence)**
