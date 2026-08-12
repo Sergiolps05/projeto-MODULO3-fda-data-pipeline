@@ -15,7 +15,7 @@ def renderizar_painel():
     # 1. BOTÃO DO AGENTE IA
     st.markdown("### 🤖 Assistente Virtual Integrado")
     st.write("Converse diretamente com os dados para obter resumos executivos.")
-    url_agente = "https://gemini.google.com/gem/7a0c575da72f/29be423e3e115ea4?hl=pt-BR"
+    url_agente = "https://notebook.google.com/notebook/a4e2976c-dac2-41a3-93cd-146ec65470fd"
     st.link_button("Abrir Agente Analítico", url_agente, type="primary")
     
     st.divider()
